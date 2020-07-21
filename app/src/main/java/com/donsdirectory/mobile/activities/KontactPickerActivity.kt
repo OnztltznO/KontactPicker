@@ -3,10 +3,8 @@ package com.donsdirectory.mobile.activities
 import android.Manifest
 import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
-import android.app.Activity
 import android.app.SearchManager
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -14,22 +12,18 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
 import com.donsdirectory.mobile.R
 import com.donsdirectory.mobile.adapters.KontactsAdapter
-import com.donsdirectory.mobile.lib.EXTRA_SELECTED_CONTACTS
 import com.donsdirectory.mobile.lib.RC_READ_CONTACTS
-import com.donsdirectory.mobile.model.MyContacts
-import com.donsdirectory.mobile.model.SelectionMode
+import com.donsdirectory.mobile.model.Contact
 import com.donsdirectory.mobile.util.*
 import kotlinx.android.synthetic.main.activity_kontact_picker.*
 import org.jetbrains.anko.alert
 import org.jetbrains.anko.longToast
-import org.jetbrains.anko.toast
 import org.jetbrains.anko.yesButton
 
 /**
@@ -37,36 +31,31 @@ import org.jetbrains.anko.yesButton
  */
 
 class KontactPickerActivity : AppCompatActivity() {
-    private var myKontacts: MutableList<MyContacts>? = mutableListOf()
-    private var selectedKontacts: MutableList<MyContacts> = ArrayList()
+    private var myKontacts: ArrayList<Contact>? = arrayListOf()
     private var kontactsAdapter: KontactsAdapter? = null
     private var debugMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        applyCustomTheme(KontactPickerUI.getTheme())
         setContentView(R.layout.activity_kontact_picker)
 
-//        debugMode = KontactPickerUI.getDebugMode()
-        logInitialValues()
         initToolbar()
 
         kontactsAdapter =
-            KontactsAdapter(myKontacts) { contact, _, view ->
-                onItemClick(contact, view)
-            }
+            KontactsAdapter(myKontacts)
+//            { contact, _, view ->
+//                onItemClick(contact, view)
+//            }
         recycler_view.init(this)
         recycler_view.adapter = kontactsAdapter
         checkPermission()
-
-        fab_done.setOnClickListener { sendResultIntent() }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.kontact_menu, menu)
 
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val search = menu?.findItem(R.id.action_search)?.actionView as SearchView
+        val search = menu.findItem(R.id.action_search)?.actionView as SearchView
 
         search.queryHint = getString(R.string.SearchHint)
         search.apply {
@@ -123,69 +112,13 @@ class KontactPickerActivity : AppCompatActivity() {
         backgroundColorAnimator.start()
     }
 
-    private fun logInitialValues() {
-        if (debugMode) {
-            log("DebugMode: $debugMode")
-            log("SelectionTickVIew: ${KontactPickerUI.getSelectionTickView()}")
-            log("Default Text Color: ${KontactPickerUI.getTextBgColor()}")
-            log("Image Mode: ${KontactPickerUI.getImageMode()}")
-        }
-    }
-
     private fun initToolbar() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
     }
 
-    private fun onItemClick(contact: MyContacts?, view: View) {
-        when (KontactPickerUI.getPickerItem().selectionMode) {
-            is SelectionMode.Single -> {
-                contact?.isSelected = !(contact?.isSelected ?: false)
-                contact?.let { selectedKontacts.add(it) }
-                sendResultIntent()
-            }
-            is SelectionMode.Multiple -> addSelectedItem(contact, view)
-            is SelectionMode.Custom -> {
-                val custom = KontactPickerUI.getPickerItem().selectionMode as SelectionMode.Custom
-                if (selectedKontacts.size >= custom.limit && contact?.isSelected == false) {
-                    toast(getLimitMessage(custom.limit))
-                    return
-                } else {
-                    addSelectedItem(contact, view)
-                }
-            }
-        }
-        setSubtitle()
-    }
-
-    private fun addSelectedItem(contact: MyContacts?, view: View) {
-        contact?.isSelected = !(contact?.isSelected ?: false)
-        if (contact?.isSelected == true) {
-            view.show()
-            selectedKontacts.add(contact)
-        } else if (contact?.isSelected == false) {
-            view.hide()
-            selectedKontacts.remove(contact)
-        }
-    }
-
-    private fun getLimitMessage(limit: Int) = KontactPickerUI.getPickerItem().limitMsg.format(limit)
-
-    private fun getSelectedKontacts(): ArrayList<MyContacts> {
-        val list = arrayListOf<MyContacts>()
-        for (contact in this.selectedKontacts) {
-            if (contact.isSelected)
-                list.add(contact)
-        }
-        return list
-    }
-
-    private fun setSubtitle() {
-        supportActionBar?.subtitle = "${getSelectedKontacts().size} of ${myKontacts?.size} Contacts"
-    }
-
     private fun filterContacts(text: String) {
-        val tempList = arrayListOf<MyContacts>()
+        val tempList = arrayListOf<Contact>()
         for (contact in this.myKontacts!!) {
             val name = contact.contactName
             val number = contact.contactNumber
@@ -235,14 +168,6 @@ class KontactPickerActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendResultIntent() {
-        val result = Intent()
-        val list = getSelectedKontacts()
-        result.putExtra(EXTRA_SELECTED_CONTACTS, list)
-        setResult(Activity.RESULT_OK, result)
-        finish()
-    }
-
     private fun loadContacts() {
         myKontacts?.clear()
         progress_bar.show()
@@ -255,7 +180,6 @@ class KontactPickerActivity : AppCompatActivity() {
                 log("Fetching Completed in $fetchingTime ms")
             }
             progress_bar.hide()
-            setSubtitle()
             kontactsAdapter?.notifyDataSetChanged()
         }
     }

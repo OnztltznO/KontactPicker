@@ -9,7 +9,7 @@
     <!-- Text to display on buttons -->
     <string name="LoginButtonText">Log-in</string>
     <string name="SubscribeButtonText">Subscribe</string>
-    <string name="RecoveryButtonText">Forgot my Log-in</string>
+    <string name="RecoveryButtonText">Recovery</string>
 
     <!-- Required text which describes the image -->
     <string name="ImageDescription">Don\'s Directory logo</string>
@@ -20,7 +20,7 @@
     <string name="SearchButtonDescription">Click to search in Don\'s Directory and my phone book</string>
 
     <!-- Text appearing underneath the search box when highlighted, giving search suggestions -->
-    <string name="SearchHint">e.g. Contact name, Location, or Industry</string>
+    <string name="SearchHint">Search</string>
 
     <!-- These fields will be replaced by the layout filler function -->
     <string name="primaryText">ADESCO-Advance Drilling Equipment Supply Co.</string>

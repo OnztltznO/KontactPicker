@@ -19,9 +19,5 @@ object KontactPickerUI {
 
     fun getTheme() = kontactPickerItem.themeResId
 
-    fun getImageMode() = kontactPickerItem.imageMode
-
-    fun getSelectionTickView() = kontactPickerItem.selectionTickView
-
     fun getTextBgColor() = kontactPickerItem.textBgColor
 }

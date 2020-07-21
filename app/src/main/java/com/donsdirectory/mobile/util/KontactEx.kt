@@ -1,10 +1,8 @@
 package com.donsdirectory.mobile.util
 
 import android.app.Activity
-import android.net.Uri
 import android.provider.ContactsContract
-import android.util.Log
-import com.donsdirectory.mobile.model.MyContacts
+import com.donsdirectory.mobile.model.Contact
 import org.jetbrains.anko.doAsyncResult
 import org.jetbrains.anko.onComplete
 
@@ -14,16 +12,17 @@ import org.jetbrains.anko.onComplete
 
 class KontactEx {
 
-    fun getAllContacts(activity: Activity?, onCompleted: (MutableList<MyContacts>) -> Unit) {
+    fun getAllContacts(activity: Activity?, onCompleted: (ArrayList<Contact>) -> Unit) {
         val startTime = System.currentTimeMillis()
         val projection = arrayOf(
             ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
             ContactsContract.Contacts.DISPLAY_NAME,
             ContactsContract.CommonDataKinds.Phone.NUMBER,
-            ContactsContract.CommonDataKinds.Email.ADDRESS
+            ContactsContract.CommonDataKinds.Email.ADDRESS,
+            ContactsContract.CommonDataKinds.Organization.COMPANY
         )
 
-        val contactMap = mutableMapOf<String, MyContacts>()
+        val contactMap = mutableMapOf<String, Contact>()
         val cr = activity?.contentResolver
         doAsyncResult {
             cr?.query(
@@ -33,35 +32,38 @@ class KontactEx {
                 val idIndex = it.getColumnIndex(ContactsContract.Data.CONTACT_ID)
                 val nameIndex = it.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
                 val numberIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                val emailIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA)
+                val emailIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS)
+                val companyIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Organization.COMPANY)
 
                 var id: String
                 var name: String
                 var number: String
                 var email: String
+                var company: String
+
                 while (it.moveToNext()) {
-                    val contacts = MyContacts()
+                    val contacts = Contact()
                     id = it.getLong(idIndex).toString()
                     name = it.getString(nameIndex)
                     number = it.getString(numberIndex).replace(" ", "")
                     email = it.getString(emailIndex)
+                    company = it.getString(companyIndex)
 
                     contacts.contactId = id
                     contacts.contactName = name
                     contacts.contactNumber = number
                     contacts.contactNumberList = arrayListOf(number)
                     contacts.contactEmail = email
+                    contacts.contactCompany = company
 
-                    Log.d("KontactEx", email)
-
-                    if (contactMap[id] != null) {
-                        val list = contactMap[id]?.contactNumberList!!
-                        if (!list.contains(number))
-                            list.add(number)
-                        contacts.contactNumberList = list
-                    } else {
+//                    if (contactMap[id] != null) {
+//                        val list = contactMap[id]?.contactNumberList!!
+//                        if (!list.contains(number))
+//                            list.add(number)
+//                        contacts.contactNumberList = list
+//                    } else {
                         contactMap[id] = contacts
-                    }
+//                    }
                 }
                 it.close()
             }
@@ -74,29 +76,19 @@ class KontactEx {
         }
     }
 
-    private fun filterContactsFromMap(contactMap: MutableMap<String, MyContacts>): MutableList<MyContacts> {
-        val myKontacts: MutableList<MyContacts> = arrayListOf()
+    private fun filterContactsFromMap(contactMap: MutableMap<String, Contact>): ArrayList<Contact> {
+        val myKontacts: ArrayList<Contact> = arrayListOf()
         val phoneList = arrayListOf<String>()
         contactMap.entries.forEach {
             val contact = it.value
 
-            val isUriEnable = KontactPickerUI.getPickerItem().includePhotoUri
-//            val isLargeUriEnable = KontactPickerUI.getPickerItem().getLargePhotoUri
-            var photoUri: Uri? = null
-            if (isUriEnable) {
-                photoUri = getContactImageUri(contact.contactId?.toLong()!!)
-//                if (isLargeUriEnable)
-//                    getContactImageLargeUri(contact.contactId?.toLong()!!)
-//                else
-
-            }
-
             contact.contactNumberList.forEach { number ->
                 if (!phoneList.contains(number)) {
-                    val newContact = MyContacts(
+                    val newContact = Contact(
                         contact.contactId,
                         contact.contactName,
-                        number, false, photoUri,
+                        number,
+                        false,
                         contact.contactNumberList
                     )
                     myKontacts.add(newContact)

@@ -3,6 +3,7 @@ package com.donsdirectory.mobile.lib
 import android.app.Activity
 import android.content.Intent
 import com.donsdirectory.mobile.activities.KontactPickerActivity
+import com.donsdirectory.mobile.model.Contact
 import com.donsdirectory.mobile.model.KontactPickerItem
 import com.donsdirectory.mobile.model.MyContacts
 import com.donsdirectory.mobile.util.KontactEx
@@ -31,43 +32,13 @@ class KontactPicker {
         }
 
         /**
-         * returns list of selected contact's phone number
-         */
-        fun getSelectedPhoneList(data: Intent?): ArrayList<String?> {
-            val kontactsList =
-                getSelectedKontacts(
-                    data
-                )
-            val phoneList = arrayListOf<String?>()
-            kontactsList?.let {
-                for (contact in it) {
-                    phoneList.add(contact.contactNumber)
-                }
-            }
-            return phoneList
-        }
-
-        /**
-         * Get All contacts with name and phone number
-         */
-        fun getAllKontacts(activity: Activity?, onSuccess: (MutableList<MyContacts>) -> Unit) {
-            KontactEx().getAllContacts(activity) {
-                onSuccess.invoke(it)
-            }
-        }
-
-        /**
          * Get All contacts with name, phone number and photoUri
          */
         fun getAllKontactsWithUri(
             activity: Activity?,
-            getLargeUri: Boolean = false,
-            onSuccess: (MutableList<MyContacts>) -> Unit
+            onSuccess: (ArrayList<Contact>) -> Unit
         ) {
-            val item = KontactPickerItem().apply {
-                includePhotoUri = true
-                getLargePhotoUri = getLargeUri
-            }
+            val item = KontactPickerItem()
             KontactPickerUI.setPickerUI(item)
             KontactEx().getAllContacts(activity) {
                 onSuccess.invoke(it)

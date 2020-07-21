@@ -7,10 +7,11 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import com.donsdirectory.mobile.R
-import com.donsdirectory.mobile.adapters.ContactAdapter
+import com.donsdirectory.mobile.adapters.KontactsAdapter
 import com.donsdirectory.mobile.databinding.ActivityMainBinding
 import com.donsdirectory.mobile.lib.KontactPicker
-import com.donsdirectory.mobile.model.*
+import com.donsdirectory.mobile.model.Contact
+import com.donsdirectory.mobile.model.KontactPickerItem
 import com.donsdirectory.mobile.util.init
 
 /**
@@ -19,12 +20,12 @@ import com.donsdirectory.mobile.util.init
 
 class MainActivity : AppCompatActivity() {
     private var myContacts: ArrayList<Contact>? = ArrayList()
-    private var contactsAdapter: ContactAdapter? = null
+    private var contactsAdapter: KontactsAdapter? = null
 
-    val debugModeCheck = MutableLiveData<Boolean>()
-    val imageModeGroup = MutableLiveData<Int>()
-    val selectionTickViewGroup = MutableLiveData<Int>()
-    val selectionModeGroup = MutableLiveData<Int>()
+    private val debugModeCheck = MutableLiveData<Boolean>()
+    private val imageModeGroup = MutableLiveData<Int>()
+    private val selectionTickViewGroup = MutableLiveData<Int>()
+    private val selectionModeGroup = MutableLiveData<Int>()
     private var colorDefault: Int? = null
     private lateinit var binding: ActivityMainBinding
 
@@ -38,7 +39,7 @@ class MainActivity : AppCompatActivity() {
 //        binding.lifecycleOwner = this
 
         contactsAdapter =
-            ContactAdapter(myContacts)
+            KontactsAdapter(myContacts)
         binding.recyclerView.init(applicationContext)
         binding.recyclerView.adapter = contactsAdapter
 
@@ -51,19 +52,19 @@ class MainActivity : AppCompatActivity() {
         val startTime = System.currentTimeMillis()
 //        binding.progressBar.show()
         myContacts?.clear()
-        contactsAdapter?.updateList(myContacts)
+        contactsAdapter?.updateList(myContacts!!)
         KontactPicker.getAllKontactsWithUri(this) {
 //            binding.progressBar.hide()
             for (contact in it) {
                 myContacts?.add(
                     Contact(
                         contact.contactName,
-                        contact.contactNumber,
-                        contact.photoUri
+                        contact.contactNumber
+//                        contact.photoUri
                     )
                 )
             }
-            contactsAdapter?.updateList(myContacts)
+            contactsAdapter?.updateList(myContacts!!)
 
             val fetchingTime = System.currentTimeMillis() - startTime
             Log.d("Main","Fetching Completed in $fetchingTime ms")
@@ -75,66 +76,29 @@ class MainActivity : AppCompatActivity() {
             debugMode = debugModeCheck.value ?: false
             //            textBgColor = ContextCompat.getColor(this@MainActivity, R.color.colorBlue100)
             colorDefault?.let { textBgColor = it }
-            includePhotoUri = true
             themeResId = R.style.CustomTheme
-            imageMode = when (imageModeGroup.value) {
-                0 -> ImageMode.None
-                1 -> ImageMode.TextMode
-                2 -> ImageMode.UserImageMode
-                else -> ImageMode.None
-            }
-            selectionTickView = when (selectionTickViewGroup.value) {
-                0 -> SelectionTickView.SmallView
-                1 -> SelectionTickView.LargeView
-                else -> SelectionTickView.SmallView
-            }
-            selectionMode = when (selectionModeGroup.value) {
-                0 -> SelectionMode.Single
-                1 -> SelectionMode.Multiple
-                else -> SelectionMode.Multiple
-            }
         }
 
         KontactPicker()
             .startPickerForResult(this, item, 3000)
     }
 
-//    private fun openColorPicker() {
-//        MaterialDialog(this).show {
-//            title(R.string.colors)
-//            colorChooser(ColorPalette.Primary) { _, color ->
-//                colorDefault = color
-//                log("color: $color")
-//                binding.btnColorPicker.background = color.toDrawable()
-//            }
-//            positiveButton(R.string.select)
-//            negativeButton(R.string.select_none) {
-//                binding.btnColorPicker.background = ContextCompat.getDrawable(
-//                    this@MainActivity, android.R.color.darker_gray
-//                )
-//                colorDefault = null
-//            }
-//        }
-//    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK && requestCode == 3000) {
             val list = KontactPicker.getSelectedKontacts(data)
-//            binding.titleSelectedContacts.setText(R.string.selected_contacts)
             myContacts = arrayListOf()
             if (list != null) {
                 for (contact in list) {
                     myContacts?.add(
                         Contact(
                             contact.contactName,
-                            contact.contactNumber,
-                            contact.photoUri
+                            contact.contactNumber
                         )
                     )
                 }
             }
-            contactsAdapter?.updateList(myContacts)
+            contactsAdapter?.updateList(myContacts!!)
         }
     }
 

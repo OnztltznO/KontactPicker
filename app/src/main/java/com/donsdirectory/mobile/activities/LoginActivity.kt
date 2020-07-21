@@ -9,10 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import com.donsdirectory.mobile.R
 import com.donsdirectory.mobile.lib.KontactPicker
 import com.donsdirectory.mobile.lib.RC_READ_CONTACTS
-import com.donsdirectory.mobile.model.ImageMode
 import com.donsdirectory.mobile.model.KontactPickerItem
-import com.donsdirectory.mobile.model.SelectionMode
-import com.donsdirectory.mobile.model.SelectionTickView
 import kotlinx.android.synthetic.main.activity_login_page.*
 
 class LoginPage : AppCompatActivity() {
@@ -36,24 +33,7 @@ class LoginPage : AppCompatActivity() {
                     debugMode = debugModeCheck.value ?: false
                     //            textBgColor = ContextCompat.getColor(this@MainActivity, R.color.colorBlue100)
                     colorDefault?.let { textBgColor = it }
-                    includePhotoUri = true
                     themeResId = R.style.CustomTheme
-                    imageMode = when (imageModeGroup.value) {
-                        0 -> ImageMode.None
-                        1 -> ImageMode.TextMode
-                        2 -> ImageMode.UserImageMode
-                        else -> ImageMode.None
-                    }
-                    selectionTickView = when (selectionTickViewGroup.value) {
-                        0 -> SelectionTickView.SmallView
-                        1 -> SelectionTickView.LargeView
-                        else -> SelectionTickView.SmallView
-                    }
-                    selectionMode = when (selectionModeGroup.value) {
-                        0 -> SelectionMode.Single
-                        1 -> SelectionMode.Multiple
-                        else -> SelectionMode.Multiple
-                    }
                 }
 
                 KontactPicker().startPickerForResult(this, item, RC_READ_CONTACTS)

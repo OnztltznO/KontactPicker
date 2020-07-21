@@ -23,13 +23,4 @@
         android:visibility="gone"
         tools:targetApi="lollipop" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_done"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="8dp"
-        android:background="@color/colorPrimary"
-        android:src="@drawable/ic_check_white" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
