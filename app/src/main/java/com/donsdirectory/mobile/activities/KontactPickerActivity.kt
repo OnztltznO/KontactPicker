@@ -5,9 +5,11 @@ import android.animation.ArgbEvaluator
 import android.animation.ObjectAnimator
 import android.app.SearchManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.util.Log
 import android.util.TypedValue
 import android.view.Menu
@@ -49,6 +51,14 @@ class KontactPickerActivity : AppCompatActivity() {
         recycler_view.init(this)
         recycler_view.adapter = kontactsAdapter
         checkPermission()
+
+        add_new_contact_button.setOnClickListener {
+            val intent = Intent(ContactsContract.Intents.Insert.ACTION).apply {
+                // Sets the MIME type to match the Contacts Provider
+                type = ContactsContract.RawContacts.CONTENT_TYPE
+            }
+            startActivity(intent)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
