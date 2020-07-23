@@ -59,8 +59,8 @@ class KontactsAdapter(
                 if (contact?.contactNumber?.isNotEmpty()!!)
                     contactMobileView.text = contact.contactNumber
 
-                if (contact.contactEmail != null)
-                    contactEmailView.text = contact.contactEmail
+                if (contact.emailAddress != null)
+                    contactEmailView.text = contact.emailAddress
             }
     }
 }

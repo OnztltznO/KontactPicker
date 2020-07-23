@@ -14,9 +14,10 @@ data class Contact(
     var contactNumber: String? = null,
     var isSelected: Boolean = false,
     var contactNumberList: ArrayList<String> = arrayListOf(),
-    var contactEmailList: ArrayList<String> = arrayListOf(),
-    var contactCompanyList: ArrayList<String> = arrayListOf(),
     var photoUri: String? = null,
-    var contactEmail: String? = null,
-    var contactCompany: String? = null
+    var contactCompany: String? = null,
+    var emailLabel: String? = null,
+    var emailType: String? = null,
+    var emailAddress: String? = null
+
 ) : Parcelable

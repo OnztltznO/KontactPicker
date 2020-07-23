@@ -2,6 +2,8 @@ package com.donsdirectory.mobile.util
 
 import android.app.Activity
 import android.provider.ContactsContract
+import android.provider.ContactsContract.CommonDataKinds.Email
+import android.util.Log
 import com.donsdirectory.mobile.model.Contact
 import org.jetbrains.anko.doAsyncResult
 import org.jetbrains.anko.onComplete
@@ -12,13 +14,60 @@ import org.jetbrains.anko.onComplete
 
 class KontactEx {
 
+//    private fun getEmails(activity: Activity?, contactId: Int? = null) {
+//        val emails = SparseArray<ArrayList<Email>>()
+//        val uri = Email.CONTENT_URI
+//        val projection = arrayOf(
+//            ContactsContract.Data.RAW_CONTACT_ID,
+//            Email.DATA,
+//            Email.TYPE,
+//            Email.LABEL
+//        )
+//
+//        val selection = "${ContactsContract.Data.RAW_CONTACT_ID} = ?"
+//        val selectionArgs = arrayOf(contactId.toString())
+//        val cr = activity?.contentResolver
+//
+//        var cursor: Cursor? = null
+//
+//        cr?.query(
+//            ContactsContract.CommonDataKinds.Phone.CONTENT_URI, projection,
+//            null, null, null
+//        )?.use {
+//            if (cursor?.moveToFirst()!!) {
+//                do {
+//                    val id = cursor.getIntValue(ContactsContract.Data.RAW_CONTACT_ID)
+//                    val email =
+//                        cursor.getStringValue(Email.DATA)
+//                            ?: continue
+//                    val type = cursor.getIntValue(Email.TYPE)
+//                    val label =
+//                        cursor.getStringValue(Email.LABEL)
+//                            ?: ""
+//
+//                    if (emails[id] == null) {
+//                        emails.put(id, ArrayList())
+//
+//                    }
+//                    emails[id]!!.add(Email(email, type, label))
+//
+//                } while (cursor.moveToNext())
+//            }
+//
+//
+//            return emails
+//        }
+//    }
+
     fun getAllContacts(activity: Activity?, onCompleted: (ArrayList<Contact>) -> Unit) {
         val startTime = System.currentTimeMillis()
         val projection = arrayOf(
             ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
             ContactsContract.Contacts.DISPLAY_NAME,
             ContactsContract.CommonDataKinds.Phone.NUMBER,
-            ContactsContract.CommonDataKinds.Email.ADDRESS,
+            Email.ADDRESS,
+            Email.TYPE,
+            Email.LABEL,
             ContactsContract.CommonDataKinds.Organization.COMPANY
         )
 
@@ -26,37 +75,33 @@ class KontactEx {
         val cr = activity?.contentResolver
         doAsyncResult {
             cr?.query(
-                ContactsContract.CommonDataKinds.Phone.CONTENT_URI, projection,
+                ContactsContract.Data.CONTENT_URI, projection,
                 null, null, null
             )?.use {
-                val idIndex = it.getColumnIndex(ContactsContract.Data.CONTACT_ID)
-                val nameIndex = it.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
-                val numberIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                val emailIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Email.ADDRESS)
-                val companyIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Organization.COMPANY)
 
-                var id: String
-                var name: String
-                var number: String
-                var email: String
-                var company: String
+//                it.getLong(it.getColumnIndex()).toString()
 
+
+                Log.d("KontactEx","REACHED WHILE LOOP KONTACTEX")
                 while (it.moveToNext()) {
                     val contacts = Contact()
-                    id = it.getLong(idIndex).toString()
-                    name = it.getString(nameIndex)
-                    number = it.getString(numberIndex).replace(" ", "")
-                    email = it.getString(emailIndex)
-                    company = it.getString(companyIndex)
+                    contacts.contactId = it.getLong(it.getColumnIndex(ContactsContract.Data.CONTACT_ID)).toString()
+                    contacts.contactName = it.getLong(it.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)).toString()
+                    contacts.contactNumber = it.getLong(it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).toString()
+//                contacts.contactNumberList = arrayListOf(number)
+                    contacts.emailAddress = it.getLong(it.getColumnIndex(Email.ADDRESS)).toString()
+                    contacts.emailType = it.getLong(it.getColumnIndex(Email.TYPE)).toString()
+                    contacts.emailLabel = it.getLong(it.getColumnIndex(Email.LABEL)).toString()
+//                    contacts.contactCompany = ContactsContract.CommonDataKinds.Organization.COMPANY
 
-                    contacts.contactId = id
-                    contacts.contactName = name
-                    contacts.contactNumber = number
-                    contacts.contactNumberList = arrayListOf(number)
-                    contacts.contactEmail = email
-                    contacts.contactEmailList = arrayListOf(email)
-                    contacts.contactCompany = company
-                    contacts.contactCompanyList = arrayListOf(company)
+
+                    Log.d("KontactEx","Contact Id: " + contacts.contactId)
+                    Log.d("KontactEx","Contact Name: " + contacts.contactName)
+                    Log.d("KontactEx","Contact Phone Number: " + contacts.contactNumber.toString())
+                    Log.d("KontactEx","Contact Email: " + contacts.emailType)
+
+//                    contactMap[id] = contacts
+//                    Log.d("KontactEx","Contact Company: " + contacts.contactCompany)
 
 //                    if (contactMap[id] != null) {
 //                        val numberList = contactMap[id]?.contactNumberList!!
@@ -74,7 +119,7 @@ class KontactEx {
 //
 //
 //                    } else {
-                        contactMap[id] = contacts
+
 //                    }
                 }
                 it.close()
