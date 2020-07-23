@@ -41,7 +41,7 @@ class KontactPickerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_kontact_picker)
 
-        initToolbar()
+//        initToolbar()
 
         kontactsAdapter =
             KontactsAdapter(myKontacts)
@@ -58,6 +58,7 @@ class KontactPickerActivity : AppCompatActivity() {
                 type = ContactsContract.RawContacts.CONTENT_TYPE
             }
             startActivity(intent)
+            kontactsAdapter?.notifyDataSetChanged()
         }
     }
 

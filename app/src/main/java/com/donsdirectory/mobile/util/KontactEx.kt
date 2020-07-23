@@ -58,24 +58,24 @@ class KontactEx {
                     contacts.contactCompany = company
                     contacts.contactCompanyList = arrayListOf(company)
 
-                    if (contactMap[id] != null) {
-                        val numberList = contactMap[id]?.contactNumberList!!
-                        if (!numberList.contains(number))
-                            numberList.add(number)
-                        contacts.contactNumberList = numberList
-                        val emailList:ArrayList<String> = contactMap[id]?.contactEmailList!!
-                        if (!emailList.contains(email))
-                            emailList.add(email)
-                        contacts.contactEmailList = emailList
-                        val companyList:ArrayList<String> = contactMap[id]?.contactCompanyList!!
-                        if(!companyList.contains(company))
-                            companyList.add(company)
-                        contacts.contactCompanyList = companyList
-
-
-                    } else {
+//                    if (contactMap[id] != null) {
+//                        val numberList = contactMap[id]?.contactNumberList!!
+//                        if (!numberList.contains(number))
+//                            numberList.add(number)
+//                        contacts.contactNumberList = numberList
+//                        val emailList:ArrayList<String> = contactMap[id]?.contactEmailList!!
+//                        if (!emailList.contains(email))
+//                            emailList.add(email)
+//                        contacts.contactEmailList = emailList
+//                        val companyList:ArrayList<String> = contactMap[id]?.contactCompanyList!!
+//                        if(!companyList.contains(company))
+//                            companyList.add(company)
+//                        contacts.contactCompanyList = companyList
+//
+//
+//                    } else {
                         contactMap[id] = contacts
-                    }
+//                    }
                 }
                 it.close()
             }
